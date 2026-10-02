@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { Company } from '../types';
-import { MapPin, FileText, CheckCircle2, Heart, X, Star, Info, Sparkles, ChevronDown } from 'lucide-react';
+import { MapPin, FileText, CheckCircle2, Info, Sparkles } from 'lucide-react';
 
 interface SwipeCardProps {
   company: Company;
@@ -11,7 +11,7 @@ interface SwipeCardProps {
 }
 
 export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe, onOpenDetails }) => {
-  const [showFullDesc, setShowFullDesc] = useState(false);
+  const [showFullDesc] = useState(false);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotate = useTransform(x, [-250, 250], [-18, 18]);
@@ -23,8 +23,8 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
   const superOpacity = useTransform(y, [-20, -120], [0, 1]);
 
   const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 100;
-    const velocity = 500;
+    const threshold = 80;
+    const velocity = 400;
 
     if (info.offset.y < -threshold || info.velocity.y < -velocity) {
       onSwipe('super');
@@ -45,51 +45,57 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
 
   return (
     <motion.div
+      key={company.id}
+      initial={!isFront ? { scale: 0.95, y: 12, opacity: 0.9 } : false}
+      animate={
+        isFront
+          ? { scale: 1, y: 0, opacity: 1 }
+          : { scale: 0.95, y: 12, opacity: 0.9 }
+      }
+      exit={{ opacity: 0, transition: { duration: 0.2 } }}
+      transition={{ duration: 0.25 }}
       style={{
         x: isFront ? x : 0,
         y: isFront ? y : 0,
         rotate: isFront ? rotate : 0,
-        opacity: isFront ? opacity : 1,
-        touchAction: 'none'
+        opacity: isFront ? opacity : 0.9,
+        touchAction: 'none',
       }}
       drag={isFront ? true : false}
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={0.9}
+      dragElastic={0.85}
       onDragEnd={isFront ? handleDragEnd : undefined}
-      className={`absolute inset-0 w-full h-full rounded-[2rem] overflow-hidden select-none shadow-2xl bg-white border border-slate-200/80 cursor-grab active:cursor-grabbing ${
-        !isFront ? 'scale-95 translate-y-3 pointer-events-none' : ''
+      className={`absolute inset-0 w-full h-full rounded-[2rem] overflow-hidden select-none shadow-2xl bg-white border border-slate-200/90 flex flex-col ${
+        isFront ? 'cursor-grab active:cursor-grabbing z-20' : 'pointer-events-none z-10'
       }`}
     >
-      {/* Background Hero Image */}
-      <div className="relative w-full h-3/5 overflow-hidden bg-slate-900 flex items-center justify-center">
-        {/* Soft background glow */}
+      {/* 1. Header Hero Area: Logo framed with clear contrast */}
+      <div className="relative w-full h-1/2 overflow-hidden bg-slate-900 flex items-center justify-center p-4">
+        {/* Dark backdrop */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 opacity-95" />
 
         {/* Company Photo / Logo */}
-        <div className="relative z-10 w-full h-full flex items-center justify-center p-6">
+        <div className="relative z-10 w-full h-full flex items-center justify-center p-3">
           <img
             src={company.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80'}
             alt={company.name}
-            className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition duration-300 transform group-hover:scale-105"
+            className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition duration-300 pointer-events-none"
           />
         </div>
 
-        {/* Dynamic Gradient Overlay for contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent pointer-events-none" />
-
         {/* Floating Category Tag */}
-        <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+        <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
           <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md backdrop-blur-md ${categoryColorMap[company.category] || 'bg-slate-800 text-white'}`}>
             {company.industry}
           </span>
-          <span className="bg-black/40 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold">
+          <span className="bg-black/50 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold">
             <MapPin className="w-3 h-3 text-amber-400" />
             {company.city}
           </span>
         </div>
 
         {/* Slots Badge */}
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-4 right-4 z-20">
           <span className="bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" />
             {company.slots} TIP-Plätze
@@ -113,41 +119,41 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
             </motion.div>
             <motion.div
               style={{ opacity: superOpacity }}
-              className="absolute bottom-16 left-1/2 -translate-x-1/2 border-4 border-amber-400 text-amber-400 font-black text-3xl px-5 py-1.5 rounded-2xl pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-amber-950/30 shadow-2xl z-30 text-center"
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 border-4 border-amber-400 text-amber-400 font-black text-3xl px-5 py-1.5 rounded-2xl pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-amber-950/30 shadow-2xl z-30 text-center"
             >
               ⭐ TRAUMBERUF
             </motion.div>
           </>
         )}
-
-        {/* Title & Info on image */}
-        <div className="absolute bottom-4 left-4 right-4 text-white z-10">
-          <h3 className="text-2xl font-black leading-tight drop-shadow-md text-white">
-            {company.name}
-          </h3>
-          <p className="text-sm text-slate-300 font-medium flex items-center gap-1.5 mt-0.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            Tag in der Praxis Partner
-          </p>
-        </div>
       </div>
 
-      {/* Body / Card Bottom */}
-      <div className="p-5 h-2/5 flex flex-col justify-between bg-white text-slate-800">
+      {/* 2. Body / Content Area */}
+      <div className="p-5 h-1/2 flex flex-col justify-between bg-white text-slate-800 border-t border-slate-100">
         <div>
+          {/* Company Title */}
+          <div className="mb-2">
+            <h3 className="text-xl font-black leading-snug text-slate-900 tracking-tight">
+              {company.name}
+            </h3>
+            <p className="text-xs text-school-blue font-bold flex items-center gap-1 mt-0.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              Tag in der Praxis Partner
+            </p>
+          </div>
+
           {/* Highlights */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
+          <div className="flex flex-wrap gap-1.5 mb-2.5">
             {company.highlights.slice(0, 3).map((item, idx) => (
               <span
                 key={idx}
-                className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/60"
+                className="text-xs font-semibold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/60"
               >
                 {item}
               </span>
             ))}
           </div>
 
-          {/* Description preview */}
+          {/* Description */}
           <p className={`text-xs text-slate-600 leading-relaxed ${showFullDesc ? '' : 'line-clamp-2'}`}>
             {company.shortDescription}
           </p>
