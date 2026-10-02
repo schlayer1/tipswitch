@@ -12,10 +12,17 @@ interface SwipeCardProps {
 
 export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe, onOpenDetails }) => {
   const [showFullDesc] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const rotate = useTransform(x, [-250, 250], [-18, 18]);
+  const rotate = useTransform(x, [-250, 250], [-16, 16]);
   const opacity = useTransform(x, [-300, -200, 0, 200, 300], [0, 1, 1, 1, 0]);
+
+  // Dynamic holographic shimmer position during drag/swipe
+  const swipeGlintX = useTransform(x, [-200, 200], [-100, 200]);
+  const swipeGlintOpacity = useTransform(x, [-200, -30, 0, 30, 200], [0.65, 0.2, 0, 0.2, 0.65]);
 
   // Indicator badges opacity
   const likeOpacity = useTransform(x, [20, 120], [0, 1]);
@@ -33,6 +40,14 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
     } else if (info.offset.x < -threshold || info.velocity.x < -velocity) {
       onSwipe('left');
     }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isFront) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const posX = ((e.clientX - rect.left) / rect.width) * 100;
+    const posY = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePos({ x: posX, y: posY });
   };
 
   const categoryColorMap = {
@@ -65,21 +80,51 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.85}
       onDragEnd={isFront ? handleDragEnd : undefined}
-      className={`absolute inset-0 w-full h-full rounded-[2rem] overflow-hidden select-none shadow-2xl bg-white border border-slate-200/90 flex flex-col ${
-        isFront ? 'cursor-grab active:cursor-grabbing z-20' : 'pointer-events-none z-10'
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`group absolute inset-0 w-full h-full rounded-[2rem] overflow-hidden select-none shadow-2xl bg-white border border-slate-200/90 flex flex-col transition-shadow duration-300 ${
+        isFront
+          ? 'cursor-grab active:cursor-grabbing z-20 hover:shadow-[0_20px_50px_rgba(11,123,167,0.18)]'
+          : 'pointer-events-none z-10'
       }`}
     >
-      {/* 1. Header Hero Area: Logo framed with clear contrast */}
-      <div className="relative w-full h-1/2 overflow-hidden bg-slate-900 flex items-center justify-center p-4">
-        {/* Dark backdrop */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 opacity-95" />
+      {/* Dynamic Mouseover Holographic Shimmer / Sheen */}
+      {isFront && (
+        <div
+          className="pointer-events-none absolute inset-0 z-30 transition-opacity duration-300 rounded-[2rem] overflow-hidden"
+          style={{
+            opacity: isHovered ? 0.35 : 0,
+            background: `radial-gradient(circle 260px at ${mousePos.x}% ${mousePos.y}%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2) 40%, transparent 80%)`,
+          }}
+        />
+      )}
+
+      {/* Swipe Drag Dynamic Glint Beam */}
+      {isFront && (
+        <motion.div
+          className="pointer-events-none absolute inset-y-0 w-32 -skew-x-12 z-30 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+          style={{
+            left: `${swipeGlintX.get()}%`,
+            opacity: swipeGlintOpacity,
+          }}
+        />
+      )}
+
+      {/* 1. Header Hero Area: Cream / Warm Pearl Gradient Background */}
+      <div className="relative w-full h-1/2 overflow-hidden flex items-center justify-center p-4 bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F5EFE3] border-b border-amber-900/10">
+        {/* Soft radial glow in center for logo presentation */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-amber-100/30 pointer-events-none" />
+
+        {/* Subtle grid watermark */}
+        <div className="absolute inset-0 bg-[radial-gradient(#e5dec9_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none" />
 
         {/* Company Photo / Logo */}
         <div className="relative z-10 w-full h-full flex items-center justify-center p-3">
           <img
             src={company.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80'}
             alt={company.name}
-            className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition duration-300 pointer-events-none"
+            className="max-h-full max-w-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-500 pointer-events-none"
           />
         </div>
 
@@ -88,15 +133,15 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
           <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md backdrop-blur-md ${categoryColorMap[company.category] || 'bg-slate-800 text-white'}`}>
             {company.industry}
           </span>
-          <span className="bg-black/50 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold">
-            <MapPin className="w-3 h-3 text-amber-400" />
+          <span className="bg-white/80 backdrop-blur-md text-slate-700 border border-amber-900/10 text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold shadow-sm">
+            <MapPin className="w-3 h-3 text-amber-500" />
             {company.city}
           </span>
         </div>
 
         {/* Slots Badge */}
         <div className="absolute top-4 right-4 z-20">
-          <span className="bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+          <span className="bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-md flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" />
             {company.slots} TIP-Plätze
           </span>
@@ -107,19 +152,19 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
           <>
             <motion.div
               style={{ opacity: likeOpacity }}
-              className="absolute top-12 left-6 border-4 border-emerald-500 text-emerald-500 font-black text-3xl px-4 py-1.5 rounded-2xl rotate-[-15deg] pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-emerald-950/20 shadow-2xl z-30"
+              className="absolute top-12 left-6 border-4 border-emerald-500 text-emerald-500 font-black text-3xl px-4 py-1.5 rounded-2xl rotate-[-15deg] pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/60 shadow-2xl z-30"
             >
               INTERESSE
             </motion.div>
             <motion.div
               style={{ opacity: nopeOpacity }}
-              className="absolute top-12 right-6 border-4 border-rose-500 text-rose-500 font-black text-3xl px-4 py-1.5 rounded-2xl rotate-[15deg] pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-rose-950/20 shadow-2xl z-30"
+              className="absolute top-12 right-6 border-4 border-rose-500 text-rose-500 font-black text-3xl px-4 py-1.5 rounded-2xl rotate-[15deg] pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/60 shadow-2xl z-30"
             >
               WEITER
             </motion.div>
             <motion.div
               style={{ opacity: superOpacity }}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 border-4 border-amber-400 text-amber-400 font-black text-3xl px-5 py-1.5 rounded-2xl pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-amber-950/30 shadow-2xl z-30 text-center"
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 border-4 border-amber-400 text-amber-500 font-black text-3xl px-5 py-1.5 rounded-2xl pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/70 shadow-2xl z-30 text-center"
             >
               ⭐ TRAUMBERUF
             </motion.div>
@@ -128,11 +173,11 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
       </div>
 
       {/* 2. Body / Content Area */}
-      <div className="p-5 h-1/2 flex flex-col justify-between bg-white text-slate-800 border-t border-slate-100">
+      <div className="p-5 h-1/2 flex flex-col justify-between bg-white text-slate-800">
         <div>
           {/* Company Title */}
           <div className="mb-2">
-            <h3 className="text-xl font-black leading-snug text-slate-900 tracking-tight">
+            <h3 className="text-xl font-black leading-snug text-slate-900 tracking-tight group-hover:text-school-blue transition-colors">
               {company.name}
             </h3>
             <p className="text-xs text-school-blue font-bold flex items-center gap-1 mt-0.5">
@@ -146,7 +191,7 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
             {company.highlights.slice(0, 3).map((item, idx) => (
               <span
                 key={idx}
-                className="text-xs font-semibold px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/60"
+                className="text-xs font-semibold px-2 py-0.5 rounded-lg bg-amber-50/70 text-slate-700 border border-amber-200/50"
               >
                 {item}
               </span>
