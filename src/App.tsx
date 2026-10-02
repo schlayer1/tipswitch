@@ -210,7 +210,7 @@ export const App: React.FC = () => {
 
       {/* Main Top Navigation Bar */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-40 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="w-full max-w-[2100px] mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           
           {/* Logo & School Badge */}
           <div className="flex items-center gap-2.5">
@@ -275,7 +275,7 @@ export const App: React.FC = () => {
 
               {/* Student code badge */}
               {auth.role === 'student' && (
-                <span className="hidden md:inline-flex items-center font-mono font-bold text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-lg border border-slate-200">
+                <span className="hidden md:inline-flex items-center font-mono font-bold text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl border border-slate-200">
                   {auth.studentCode} ({auth.studentClass})
                 </span>
               )}
@@ -292,8 +292,16 @@ export const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col justify-center items-center p-3 sm:p-4 max-w-lg w-full mx-auto relative">
+      {/* Main Content Area - Fluid adaptive according to responsive-school-apps */}
+      <main
+        className={`flex-1 flex flex-col justify-center items-center p-3 sm:p-5 lg:p-6 w-full mx-auto relative ${
+          activeView === 'teacher'
+            ? 'max-w-[2100px]'
+            : activeView === 'matches'
+            ? 'max-w-4xl'
+            : 'max-w-md sm:max-w-lg md:max-w-xl'
+        }`}
+      >
         
         {/* VIEW 1: Tinder Swipe */}
         {activeView === 'swipe' && auth.role && (

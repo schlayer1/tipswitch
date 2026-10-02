@@ -41,14 +41,36 @@ export const CompanyDetailModal: React.FC<CompanyDetailModalProps> = ({ company,
 
         {/* Content */}
         <div className="p-6 space-y-5">
-          <div className="flex items-center justify-between text-sm text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-amber-500" />
-              <span className="font-semibold">{company.city}</span>
+          <div className="flex flex-col gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+            <div className="flex items-center justify-between text-sm text-slate-600">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-amber-500" />
+                <span className="font-semibold">{company.city}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>{company.slots} Plätze Standard</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>{company.slots} Plätze für TIP</span>
+
+            {/* Turnus Slots breakdown */}
+            <div className="grid grid-cols-4 gap-1.5 pt-2 border-t border-slate-200/60 text-center">
+              <div className="bg-white p-1 rounded-lg border border-slate-200/80">
+                <span className="text-[10px] text-slate-400 font-bold block">Turnus 1</span>
+                <span className="text-xs font-black text-slate-800">{company.turnusSlots?.turnus1 ?? company.slots} Pl.</span>
+              </div>
+              <div className="bg-white p-1 rounded-lg border border-slate-200/80">
+                <span className="text-[10px] text-slate-400 font-bold block">Turnus 2</span>
+                <span className="text-xs font-black text-slate-800">{company.turnusSlots?.turnus2 ?? company.slots} Pl.</span>
+              </div>
+              <div className="bg-white p-1 rounded-lg border border-slate-200/80">
+                <span className="text-[10px] text-slate-400 font-bold block">Turnus 3</span>
+                <span className="text-xs font-black text-slate-800">{company.turnusSlots?.turnus3 ?? company.slots} Pl.</span>
+              </div>
+              <div className="bg-white p-1 rounded-lg border border-slate-200/80">
+                <span className="text-[10px] text-slate-400 font-bold block">Turnus 4</span>
+                <span className="text-xs font-black text-slate-800">{company.turnusSlots?.turnus4 ?? company.slots} Pl.</span>
+              </div>
             </div>
           </div>
 
