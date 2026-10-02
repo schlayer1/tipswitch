@@ -7,6 +7,8 @@ interface LoginModalProps {
   onTeacherLogin: (password: string) => boolean;
 }
 
+const AVAILABLE_CLASSES = ['8a', '8b', '8c', '9a', '9b', '9c'];
+
 export const LoginModal: React.FC<LoginModalProps> = ({ onStudentLogin, onTeacherLogin }) => {
   const [tab, setTab] = useState<'code' | 'new' | 'teacher'>('code');
   const [existingCode, setExistingCode] = useState('');
@@ -122,15 +124,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onStudentLogin, onTeache
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Deine Klasse
                 </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {['8a', '8b', '9a', '9b'].map((cls) => (
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {AVAILABLE_CLASSES.map((cls) => (
                     <button
                       key={cls}
                       type="button"
                       onClick={() => setStudentClass(cls)}
                       className={`py-2 text-xs font-bold rounded-lg border transition ${
                         studentClass === cls
-                          ? 'bg-school-blue text-white border-school-blue'
+                          ? 'bg-school-blue text-white border-school-blue shadow-sm'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
@@ -182,15 +184,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onStudentLogin, onTeache
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
                   Deine Klasse
                 </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {['8a', '8b', '9a', '9b'].map((cls) => (
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {AVAILABLE_CLASSES.map((cls) => (
                     <button
                       key={cls}
                       type="button"
                       onClick={() => setStudentClass(cls)}
                       className={`py-2 text-xs font-bold rounded-lg border transition ${
                         studentClass === cls
-                          ? 'bg-school-blue text-white border-school-blue'
+                          ? 'bg-school-blue text-white border-school-blue shadow-sm'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                       }`}
                     >

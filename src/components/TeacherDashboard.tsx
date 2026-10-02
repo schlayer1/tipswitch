@@ -118,13 +118,19 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
     }
   };
 
+  const [selectedClassFilter, setSelectedClassFilter] = useState<string>('all');
+
   // Filter students
-  const filteredStudents = studentPreferences.filter(
-    (s) =>
+  const filteredStudents = studentPreferences.filter((s) => {
+    const matchesSearch =
       s.studentCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.studentClass.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      s.studentClass.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesClass =
+      selectedClassFilter === 'all' ||
+      s.studentClass.toLowerCase() === selectedClassFilter.toLowerCase();
+    return matchesSearch && matchesClass;
+  });
 
   return (
     <div className="w-full max-w-[2100px] mx-auto p-3 sm:p-5 lg:p-6 xl:p-8 space-y-6">
@@ -246,6 +252,25 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             <span className="text-xs text-slate-400 font-semibold self-end sm:self-auto">
               {filteredStudents.length} Schüler erfasst
             </span>
+          </div>
+
+          {/* Quick Class Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            <span className="text-xs font-bold text-slate-500 mr-1">Klasse:</span>
+            {['all', '8a', '8b', '8c', '9a', '9b', '9c'].map((cls) => (
+              <button
+                key={cls}
+                type="button"
+                onClick={() => setSelectedClassFilter(cls)}
+                className={`px-3 py-1 rounded-xl text-xs font-bold transition ${
+                  selectedClassFilter === cls
+                    ? 'bg-school-blue text-white shadow-sm'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                {cls === 'all' ? 'Alle Klassen' : cls}
+              </button>
+            ))}
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-x-auto">
