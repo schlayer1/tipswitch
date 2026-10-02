@@ -69,14 +69,14 @@ export const App: React.FC = () => {
         }
       }
       loadPref();
-    } else if (auth.role === 'teacher') {
+    } else if (auth.role === 'teacher' || activeView === 'teacher') {
       async function loadTeacherData() {
         const all = await fetchAllStudentPreferences();
         setAllPreferences(all);
       }
       loadTeacherData();
     }
-  }, [auth]);
+  }, [auth, activeView]);
 
   // Sync back preferences on change
   const persistPreferences = async (newLikes: string[], newSupers: string[], newDislikes: string[]) => {

@@ -47,15 +47,15 @@ export async function seedCompaniesToFirestore(): Promise<number> {
   return count;
 }
 
-
-
 export async function fetchStudentPreferences(studentCode: string): Promise<StudentPreferences | null> {
   const cleanCode = studentCode.trim().toUpperCase();
   try {
     const docRef = doc(db, PREFERENCES_COLLECTION, cleanCode);
     const snap = await getDoc(docRef);
     if (snap.exists()) {
-      return snap.data() as StudentPreferences;
+      const data = snap.data() as StudentPreferences;
+      localStorage.setItem(`tip_pref_${cleanCode}`, JSON.stringify(data));
+      return data;
     }
   } catch (error) {
     console.warn('Error reading preferences from Firestore, trying localStorage:', error);
@@ -75,7 +75,7 @@ export async function fetchStudentPreferences(studentCode: string): Promise<Stud
 
 export async function saveStudentPreferences(prefs: StudentPreferences): Promise<void> {
   const cleanCode = prefs.studentCode.trim().toUpperCase();
-  const data = {
+  const data: StudentPreferences = {
     ...prefs,
     studentCode: cleanCode,
     updatedAt: new Date().toISOString()
@@ -93,29 +93,40 @@ export async function saveStudentPreferences(prefs: StudentPreferences): Promise
 }
 
 export async function fetchAllStudentPreferences(): Promise<StudentPreferences[]> {
+  const map = new Map<string, StudentPreferences>();
+
+  // 1. Read all local preferences first
   try {
-    const colRef = collection(db, PREFERENCES_COLLECTION);
-    const snap = await getDocs(colRef);
-    const list: StudentPreferences[] = [];
-    snap.forEach(d => {
-      list.push(d.data() as StudentPreferences);
-    });
-    return list;
-  } catch (error) {
-    console.warn('Error fetching all preferences:', error);
-    // Scan localStorage as fallback
-    const list: StudentPreferences[] = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key?.startsWith('tip_pref_')) {
         try {
           const val = JSON.parse(localStorage.getItem(key) || '');
-          list.push(val);
+          if (val && val.studentCode) {
+            map.set(val.studentCode.toUpperCase(), val);
+          }
         } catch {
-          // ignore
+          // ignore parse error
         }
       }
     }
-    return list;
+  } catch (e) {
+    console.warn('Error reading local storage prefs:', e);
   }
+
+  // 2. Fetch and merge from Firestore (Firestore takes precedence)
+  try {
+    const colRef = collection(db, PREFERENCES_COLLECTION);
+    const snap = await getDocs(colRef);
+    snap.forEach(d => {
+      const data = d.data() as StudentPreferences;
+      if (data && data.studentCode) {
+        map.set(data.studentCode.toUpperCase(), data);
+      }
+    });
+  } catch (error) {
+    console.warn('Error fetching all preferences from Firestore (offline or rules):', error);
+  }
+
+  return Array.from(map.values());
 }
