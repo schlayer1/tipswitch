@@ -199,7 +199,21 @@ export const App: React.FC = () => {
       {/* Login Modal */}
       {!auth.role && (
         <LoginModal
-          onStudentLogin={(code, name, cls) => loginAsStudent(code, name, cls)}
+          onStudentLogin={async (code, name, cls) => {
+            loginAsStudent(code, name, cls);
+            const existing = await fetchStudentPreferences(code);
+            if (!existing) {
+              await saveStudentPreferences({
+                studentCode: code,
+                studentName: name,
+                studentClass: cls,
+                likes: [],
+                superLikes: [],
+                dislikes: [],
+                updatedAt: new Date().toISOString(),
+              });
+            }
+          }}
           onTeacherLogin={(pass) => {
             const ok = loginAsTeacher(pass);
             if (ok) setActiveView('teacher');

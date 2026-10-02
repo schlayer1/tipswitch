@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Company, StudentPreferences } from '../types';
-import { Plus, Users, Building2, Key, Check, Copy, ExternalLink, ShieldAlert, Sliders, Calendar, ChevronDown, ChevronUp, Image as ImageIcon } from 'lucide-react';
+import { isFirebaseConfigured } from '../lib/firebase';
+import { Plus, Users, Building2, Key, Check, Copy, ExternalLink, ShieldAlert, Sliders, Calendar, ChevronDown, ChevronUp, Image as ImageIcon, Database } from 'lucide-react';
 
 interface TeacherDashboardProps {
   companies: Company[];
@@ -130,9 +131,23 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 text-white p-5 sm:p-6 lg:p-8 rounded-3xl shadow-xl">
         <div>
-          <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/30 mb-2">
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Lehrkraft-Souveränität HBS</span>
+          <div className="flex flex-wrap items-center gap-2 mb-2">
+            <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full text-xs font-bold border border-amber-500/30">
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span>Lehrkraft-Souveränität HBS</span>
+            </div>
+            {isFirebaseConfigured ? (
+              <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/30">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <Database className="w-3.5 h-3.5" />
+                <span>Firebase Cloud aktiv</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 bg-rose-500/20 text-rose-300 px-3 py-1 rounded-full text-xs font-bold border border-rose-500/30">
+                <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+                <span>Nur lokaler Speicher (Vercel Env fehlt)</span>
+              </div>
+            )}
           </div>
           <h2 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight">TIP Lehrer-Dashboard</h2>
           <p className="text-slate-400 text-xs sm:text-sm mt-1">
