@@ -51,10 +51,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({ onStudentLogin, onTeache
         
         {/* Header */}
         <div className="bg-gradient-to-br from-school-darkblue via-school-blue to-school-cyan p-6 text-white text-center relative">
-          <div className="w-14 h-14 bg-white/10 rounded-2xl mx-auto flex items-center justify-center backdrop-blur-md mb-3 border border-white/20">
-            <Sparkles className="w-8 h-8 text-amber-300" />
+          <div className="w-16 h-16 rounded-2xl mx-auto mb-3 shadow-xl overflow-hidden border-2 border-white/30">
+            <img src="/icon.svg" alt="TipSwitch Logo" className="w-full h-full object-cover" />
           </div>
-          <h2 className="text-2xl font-black tracking-tight">TIP Matching</h2>
+          <h2 className="text-2xl font-black tracking-tight">TipSwitch Matching</h2>
           <p className="text-blue-100 text-sm mt-1">Tag in der Praxis • Heimbürgeschule Kahla</p>
           <span className="inline-block mt-2 px-3 py-0.5 bg-white/20 rounded-full text-xs font-semibold backdrop-blur-sm">
             Finde deinen Wunschbetrieb im Tinder-Style

@@ -214,8 +214,8 @@ export const App: React.FC = () => {
           
           {/* Logo & School Badge */}
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-school-darkblue to-school-cyan flex items-center justify-center text-white shadow-md shadow-school-blue/20">
-              <Sparkles className="w-5 h-5 text-amber-300" />
+            <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-md shadow-school-blue/20 flex-shrink-0">
+              <img src="/icon.svg" alt="TipSwitch Logo" className="w-full h-full object-cover" />
             </div>
             <div>
               <div className="font-black text-slate-900 tracking-tight leading-none text-base">
