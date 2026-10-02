@@ -2,21 +2,25 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // 1. Tag in der Praxis (Reflexionsberichte)
+    // Voller Lese- und Schreibzugriff auf die Praktikumsberichte (Tag in der Praxis)
     match /reports/{reportId} {
       allow read, write: if true;
     }
 
-    // 2. TIP Matching (TipSwitch) - Betriebe & Stellen
-    match /tip_companies/{companyId} {
-      // Schüler und Lehrer dürfen Betriebe lesen und verwalten
+    // Voller Lese- und Schreibzugriff auf die Projektkompass-Boards
+    match /projektkompass_boards/{boardId} {
       allow read, write: if true;
     }
 
-    // 3. TIP Matching (TipSwitch) - Schülerpräferenzen (Likes & Wünsche)
-    match /tip_student_preferences/{studentCode} {
-      // Schüler identifizieren sich über ihr 4-stelliges Kürzel (HBS Standard)
+    // TIP Matching (TipSwitch) - Betriebe & Stellen
+    match /tip_companies/{companyId} {
       allow read, write: if true;
     }
+
+    // TIP Matching (TipSwitch) - Schüler-Wünsche (Likes & Superlikes)
+    match /tip_student_preferences/{studentCode} {
+      allow read, write: if true;
+    }
+
   }
 }
