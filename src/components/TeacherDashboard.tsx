@@ -288,14 +288,26 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {companies.map((comp) => (
               <div key={comp.id} className="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col justify-between space-y-3">
-                <div>
-                  <div className="flex items-start justify-between gap-2">
-                    <h4 className="font-bold text-slate-900 text-sm leading-tight">{comp.name}</h4>
-                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-blue-50 text-school-blue border border-blue-200 flex-shrink-0">
-                      {comp.slots} Plätze
-                    </span>
+                <div className="flex items-start gap-3">
+                  {/* Logo Preview */}
+                  <div className="w-14 h-14 rounded-xl bg-slate-900 border border-slate-200 p-1 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <img
+                      src={comp.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=300&q=80'}
+                      alt={comp.name}
+                      className="max-h-full max-w-full object-contain"
+                    />
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">{comp.industry} • {comp.city}</p>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-1">
+                      <h4 className="font-bold text-slate-900 text-xs leading-tight truncate">{comp.name}</h4>
+                      <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-blue-50 text-school-blue border border-blue-200 flex-shrink-0">
+                        {comp.slots} Pl.
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5 truncate">{comp.industry}</p>
+                    <p className="text-[10px] text-slate-400">{comp.city}</p>
+                  </div>
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
@@ -304,17 +316,27 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                       href={comp.pdfUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-school-blue font-bold hover:underline flex items-center gap-1"
+                      className="text-school-blue font-bold hover:underline flex items-center gap-1 text-[11px]"
                     >
                       <ExternalLink className="w-3 h-3" />
                       <span>Steckbrief</span>
                     </a>
                   ) : (
-                    <span className="text-slate-400">Kein PDF</span>
+                    <span className="text-slate-400 text-[11px]">Kein PDF</span>
                   )}
-                  <span className="text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded text-[11px]">
-                    Aktiv
-                  </span>
+                  
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const newUrl = prompt(`Bild-URL für "${comp.name}" eingeben:`, comp.imageUrl || '');
+                      if (newUrl !== null && newUrl.trim() !== comp.imageUrl) {
+                        await onSaveCompany({ ...comp, imageUrl: newUrl.trim() });
+                      }
+                    }}
+                    className="text-slate-500 hover:text-school-blue font-semibold bg-slate-50 hover:bg-blue-50 border border-slate-200 px-2 py-0.5 rounded text-[11px] transition"
+                  >
+                    Foto ändern
+                  </button>
                 </div>
               </div>
             ))}

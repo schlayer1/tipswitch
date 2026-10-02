@@ -61,15 +61,21 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
       }`}
     >
       {/* Background Hero Image */}
-      <div className="relative w-full h-3/5 overflow-hidden bg-slate-900">
-        <img
-          src={company.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80'}
-          alt={company.name}
-          className="w-full h-full object-cover object-center filter brightness-90 group-hover:scale-105 transition duration-500"
-        />
+      <div className="relative w-full h-3/5 overflow-hidden bg-slate-900 flex items-center justify-center">
+        {/* Soft background glow */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 opacity-95" />
 
-        {/* Dynamic Gradient Overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent`} />
+        {/* Company Photo / Logo */}
+        <div className="relative z-10 w-full h-full flex items-center justify-center p-6">
+          <img
+            src={company.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80'}
+            alt={company.name}
+            className="max-h-full max-w-full object-contain filter drop-shadow-2xl transition duration-300 transform group-hover:scale-105"
+          />
+        </div>
+
+        {/* Dynamic Gradient Overlay for contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent pointer-events-none" />
 
         {/* Floating Category Tag */}
         <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
