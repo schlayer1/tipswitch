@@ -6,6 +6,7 @@ interface TeacherDashboardProps {
   companies: Company[];
   studentPreferences: StudentPreferences[];
   onSaveCompany: (comp: Company) => Promise<void>;
+  onSeedCompanies?: () => Promise<number>;
   onClose: () => void;
 }
 
@@ -13,11 +14,14 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   companies,
   studentPreferences,
   onSaveCompany,
+  onSeedCompanies,
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<'students' | 'companies' | 'add'>('students');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSeeding, setIsSeeding] = useState(false);
+  const [seedSuccess, setSeedSuccess] = useState<string | null>(null);
 
   // Form for new company
   const [newName, setNewName] = useState('');
@@ -95,13 +99,45 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
           </p>
         </div>
 
-        <button
-          onClick={onClose}
-          className="self-start sm:self-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition border border-slate-700"
-        >
-          Zurück zur Schüler-Ansicht
-        </button>
+        <div className="flex items-center gap-2">
+          {onSeedCompanies && (
+            <button
+              onClick={async () => {
+                setIsSeeding(true);
+                setSeedSuccess(null);
+                try {
+                  const count = await onSeedCompanies();
+                  setSeedSuccess(`${count} Betriebe erfolgreich in Firebase gespeichert!`);
+                  setTimeout(() => setSeedSuccess(null), 4000);
+                } catch {
+                  alert('Fehler beim Synchronisieren nach Firebase.');
+                } finally {
+                  setIsSeeding(false);
+                }
+              }}
+              disabled={isSeeding}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition shadow-sm"
+              title="Lädt alle 53 EduPage-Betriebe in deine Firestore-Datenbank hoch"
+            >
+              {isSeeding ? 'Synchronisiere...' : '53 Betriebe in Firebase laden'}
+            </button>
+          )}
+
+          <button
+            onClick={onClose}
+            className="self-start sm:self-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition border border-slate-700"
+          >
+            Zurück zur Schüler-Ansicht
+          </button>
+        </div>
       </div>
+
+      {seedSuccess && (
+        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2">
+          <Check className="w-4 h-4 text-emerald-600" />
+          <span>{seedSuccess}</span>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex border-b border-slate-200 gap-2">

@@ -6,6 +6,7 @@ import { INITIAL_COMPANIES } from './data/companiesData';
 import {
   fetchCompanies,
   saveCompany,
+  seedCompaniesToFirestore,
   fetchStudentPreferences,
   saveStudentPreferences,
   fetchAllStudentPreferences,
@@ -424,6 +425,7 @@ export const App: React.FC = () => {
               companies={companies}
               studentPreferences={allPreferences}
               onSaveCompany={handleTeacherSaveCompany}
+              onSeedCompanies={seedCompaniesToFirestore}
               onClose={() => setActiveView('swipe')}
             />
           </div>

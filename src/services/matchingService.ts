@@ -33,6 +33,22 @@ export async function saveCompany(company: Company): Promise<void> {
   }
 }
 
+export async function seedCompaniesToFirestore(): Promise<number> {
+  let count = 0;
+  for (const comp of INITIAL_COMPANIES) {
+    try {
+      const docRef = doc(db, COMPANIES_COLLECTION, comp.id);
+      await setDoc(docRef, comp, { merge: true });
+      count++;
+    } catch (e) {
+      console.error('Error seeding company:', comp.id, e);
+    }
+  }
+  return count;
+}
+
+
+
 export async function fetchStudentPreferences(studentCode: string): Promise<StudentPreferences | null> {
   const cleanCode = studentCode.trim().toUpperCase();
   try {

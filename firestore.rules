@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Tag in der Praxis (Reflexionsberichte)
+    match /reports/{reportId} {
+      allow read, write: if true;
+    }
+
+    // 2. TIP Matching (TipSwitch) - Betriebe & Stellen
+    match /tip_companies/{companyId} {
+      // Schüler und Lehrer dürfen Betriebe lesen und verwalten
+      allow read, write: if true;
+    }
+
+    // 3. TIP Matching (TipSwitch) - Schülerpräferenzen (Likes & Wünsche)
+    match /tip_student_preferences/{studentCode} {
+      // Schüler identifizieren sich über ihr 4-stelliges Kürzel (HBS Standard)
+      allow read, write: if true;
+    }
+  }
+}
