@@ -223,7 +223,7 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Top Navigation Bar */}
-      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-40 shadow-sm">
+      <header className="bg-white border-b border-slate-200/80 sticky top-0 z-40 shadow-sm pt-safe">
         <div className="w-full max-w-[2100px] mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
           
           {/* Logo & School Badge */}
@@ -236,7 +236,7 @@ export const App: React.FC = () => {
                 TIP Matching
               </div>
               <div className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 truncate">
-                <span className="hidden xs:inline">Heimbürgeschule </span>Kahla
+                HBS Kahla
               </div>
             </div>
           </div>
@@ -248,10 +248,10 @@ export const App: React.FC = () => {
                 <>
                   <button
                     onClick={() => setActiveView('swipe')}
-                    className={`p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                    className={`h-9 px-2.5 sm:px-3 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                       activeView === 'swipe'
                         ? 'bg-school-blue text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100'
+                        : 'text-slate-600 hover:bg-slate-100 bg-slate-50 border border-slate-200/70'
                     }`}
                     title="Karten entdecken"
                   >
@@ -261,10 +261,10 @@ export const App: React.FC = () => {
 
                   <button
                     onClick={() => setActiveView('matches')}
-                    className={`p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 relative ${
+                    className={`h-9 px-2.5 sm:px-3 rounded-xl text-xs font-bold transition flex items-center gap-1.5 relative ${
                       activeView === 'matches'
                         ? 'bg-school-blue text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100'
+                        : 'text-slate-600 hover:bg-slate-100 bg-slate-50 border border-slate-200/70'
                     }`}
                     title="Favoriten ansehen"
                   >
@@ -284,7 +284,7 @@ export const App: React.FC = () => {
               {auth.role === 'teacher' && (
                 <button
                   onClick={() => setActiveView('teacher')}
-                  className="px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm"
+                  className="h-9 px-2.5 sm:px-3.5 bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm"
                 >
                   <GraduationCap className="w-4 h-4" />
                   <span className="hidden sm:inline">Lehrerbereich</span>
@@ -301,7 +301,7 @@ export const App: React.FC = () => {
 
               <button
                 onClick={logout}
-                className="p-1.5 sm:p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                className="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition border border-slate-200/70 bg-slate-50"
                 title="Abmelden"
               >
                 <LogOut className="w-4 h-4" />
@@ -423,7 +423,7 @@ export const App: React.FC = () => {
               disabled={remainingCompanies.length === 0}
             />
 
-            <div className="text-[11px] text-slate-400 font-semibold tracking-wider uppercase text-center pb-1">
+            <div className="text-[11px] text-slate-400 font-semibold tracking-wider uppercase text-center pb-1 pb-safe">
               Swipe links: Weiter • Swipe rechts: Merken • Hoch: Traumberuf
             </div>
           </div>

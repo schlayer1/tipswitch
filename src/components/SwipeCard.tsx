@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import { Company } from '../types';
 import { MapPin, FileText, CheckCircle2, Info, Sparkles } from 'lucide-react';
+import { AutoScrollText } from './AutoScrollText';
 
 interface SwipeCardProps {
   company: Company;
@@ -217,10 +218,12 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
             ))}
           </div>
 
-          {/* Full Description text without premature cut-off */}
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            {company.shortDescription}
-          </p>
+          {/* Full Description text with gentle autoscroll */}
+          <AutoScrollText
+            text={company.shortDescription}
+            isActive={isFront}
+            className="my-0.5"
+          />
         </div>
 
         {/* Steckbrief & Detail Trigger - Stably anchored and never pushed out */}
