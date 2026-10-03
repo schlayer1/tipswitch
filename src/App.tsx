@@ -224,52 +224,56 @@ export const App: React.FC = () => {
 
       {/* Main Top Navigation Bar */}
       <header className="bg-white border-b border-slate-200/80 sticky top-0 z-40 shadow-sm">
-        <div className="w-full max-w-[2100px] mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="w-full max-w-[2100px] mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2">
           
           {/* Logo & School Badge */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-md shadow-school-blue/20 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-shrink">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl overflow-hidden shadow-md shadow-school-blue/20 flex-shrink-0">
               <img src="/icon.svg" alt="TipSwitch Logo" className="w-full h-full object-cover" />
             </div>
-            <div>
-              <div className="font-black text-slate-900 tracking-tight leading-none text-base">
+            <div className="min-w-0">
+              <div className="font-black text-slate-900 tracking-tight leading-none text-sm sm:text-base truncate">
                 TIP Matching
               </div>
-              <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">
-                Heimbürgeschule Kahla
+              <div className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5 truncate">
+                <span className="hidden xs:inline">Heimbürgeschule </span>Kahla
               </div>
             </div>
           </div>
 
           {/* User Status / View Switcher */}
           {auth.role && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
               {auth.role === 'student' && (
                 <>
                   <button
                     onClick={() => setActiveView('swipe')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                    className={`p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                       activeView === 'swipe'
                         ? 'bg-school-blue text-white shadow-sm'
                         : 'text-slate-600 hover:bg-slate-100'
                     }`}
+                    title="Karten entdecken"
                   >
                     <Layers className="w-4 h-4" />
-                    <span className="hidden sm:inline">Entdecken</span>
+                    <span className="hidden md:inline">Entdecken</span>
                   </button>
 
                   <button
                     onClick={() => setActiveView('matches')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 relative ${
+                    className={`p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 relative ${
                       activeView === 'matches'
                         ? 'bg-school-blue text-white shadow-sm'
                         : 'text-slate-600 hover:bg-slate-100'
                     }`}
+                    title="Favoriten ansehen"
                   >
-                    <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
-                    <span>Favoriten</span>
+                    <Heart className={`w-4 h-4 ${activeView === 'matches' ? 'fill-white text-white' : 'fill-rose-500 text-rose-500'}`} />
+                    <span className="hidden sm:inline">Favoriten</span>
                     {likes.length > 0 && (
-                      <span className="ml-0.5 bg-rose-500 text-white rounded-full px-1.5 py-0.2 text-[10px] font-black">
+                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black leading-none ${
+                        activeView === 'matches' ? 'bg-white text-school-blue' : 'bg-rose-500 text-white'
+                      }`}>
                         {likes.length}
                       </span>
                     )}
@@ -280,23 +284,24 @@ export const App: React.FC = () => {
               {auth.role === 'teacher' && (
                 <button
                   onClick={() => setActiveView('teacher')}
-                  className="px-3 py-1.5 bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm"
+                  className="px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Lehrerbereich</span>
+                  <span className="hidden sm:inline">Lehrerbereich</span>
+                  <span className="sm:hidden">Lehrer</span>
                 </button>
               )}
 
               {/* Student code badge */}
               {auth.role === 'student' && (
-                <span className="hidden md:inline-flex items-center font-mono font-bold text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl border border-slate-200">
+                <span className="hidden lg:inline-flex items-center font-mono font-bold text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl border border-slate-200">
                   {auth.studentCode} ({auth.studentClass})
                 </span>
               )}
 
               <button
                 onClick={logout}
-                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                className="p-1.5 sm:p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
                 title="Abmelden"
               >
                 <LogOut className="w-4 h-4" />
@@ -308,7 +313,7 @@ export const App: React.FC = () => {
 
       {/* Main Content Area - Fluid adaptive according to responsive-school-apps */}
       <main
-        className={`flex-1 flex flex-col justify-center items-center p-3 sm:p-5 lg:p-6 w-full mx-auto relative ${
+        className={`flex-1 flex flex-col justify-center items-center p-2.5 sm:p-5 lg:p-6 w-full mx-auto relative ${
           activeView === 'teacher'
             ? 'max-w-[2100px]'
             : activeView === 'matches'
@@ -319,10 +324,10 @@ export const App: React.FC = () => {
         
         {/* VIEW 1: Tinder Swipe */}
         {activeView === 'swipe' && auth.role && (
-          <div className="w-full flex flex-col items-center flex-1 justify-between max-h-[820px]">
+          <div className="w-full flex flex-col items-center flex-1 justify-between max-h-[840px]">
             
             {/* Category Filter Pills */}
-            <div className="w-full flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 px-1 mb-2">
+            <div className="w-full flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1.5 sm:py-2 px-1 mb-1 sm:mb-2">
               {[
                 { id: 'all', label: 'Alle Betriebe' },
                 { id: 'tech', label: 'IT & Hightech' },
@@ -349,7 +354,7 @@ export const App: React.FC = () => {
             </div>
 
             {/* Card Deck Area */}
-            <div className="relative w-full aspect-[3/4] max-h-[540px] mb-2">
+            <div className="relative w-full h-[58vh] min-h-[480px] max-h-[580px] sm:aspect-[3/4] sm:h-auto sm:max-h-[560px] mb-1 sm:mb-2">
               <AnimatePresence>
                 {remainingCompanies.length > 0 ? (
                   <>

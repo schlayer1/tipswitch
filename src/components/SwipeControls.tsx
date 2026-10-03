@@ -19,7 +19,7 @@ export const SwipeControls: React.FC<SwipeControlsProps> = ({
   disabled
 }) => {
   return (
-    <div className="flex items-center justify-center gap-4 py-4 px-2">
+    <div className="flex items-center justify-center gap-3 sm:gap-4 py-2 sm:py-4 px-2">
       {/* Undo */}
       <button
         type="button"

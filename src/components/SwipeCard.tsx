@@ -25,20 +25,39 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
   const swipeGlintOpacity = useTransform(x, [-200, -30, 0, 30, 200], [0.65, 0.2, 0, 0.2, 0.65]);
 
   // Indicator badges opacity
-  const likeOpacity = useTransform(x, [20, 120], [0, 1]);
-  const nopeOpacity = useTransform(x, [-20, -120], [0, 1]);
-  const superOpacity = useTransform(y, [-20, -120], [0, 1]);
+  const likeOpacity = useTransform(x, [25, 120], [0, 1]);
+  const nopeOpacity = useTransform(x, [-25, -120], [0, 1]);
+  const superOpacity = useTransform(y, [-40, -140], [0, 1]);
 
   const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const threshold = 80;
-    const velocity = 400;
+    const horizontalThreshold = 85;
+    const horizontalVelocity = 380;
+    const superThreshold = 140; // Needs deliberate upward drag to prevent accidental triggers while reading/tapping
+    const superVelocity = 600;
 
-    if (info.offset.y < -threshold || info.velocity.y < -velocity) {
-      onSwipe('super');
-    } else if (info.offset.x > threshold || info.velocity.x > velocity) {
-      onSwipe('right');
-    } else if (info.offset.x < -threshold || info.velocity.x < -velocity) {
-      onSwipe('left');
+    const absX = Math.abs(info.offset.x);
+    const absY = Math.abs(info.offset.y);
+
+    // 1. Horizontal swipe check (takes precedence if predominantly horizontal)
+    if (absX >= absY || absX > 60) {
+      if (info.offset.x > horizontalThreshold || info.velocity.x > horizontalVelocity) {
+        onSwipe('right');
+        return;
+      } else if (info.offset.x < -horizontalThreshold || info.velocity.x < -horizontalVelocity) {
+        onSwipe('left');
+        return;
+      }
+    }
+
+    // 2. Super-like check (must be predominantly upward with deliberate intent)
+    if (
+      info.offset.y < -superThreshold ||
+      (info.velocity.y < -superVelocity && info.offset.y < -60)
+    ) {
+      if (absY > absX * 1.3) {
+        onSwipe('super');
+        return;
+      }
     }
   };
 
@@ -112,7 +131,7 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
       )}
 
       {/* 1. Header Hero Area: Cream / Warm Pearl Gradient Background */}
-      <div className="relative w-full h-1/2 overflow-hidden flex items-center justify-center p-4 bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F5EFE3] border-b border-amber-900/10">
+      <div className="relative w-full h-[36%] sm:h-[40%] overflow-hidden flex items-center justify-center p-3 sm:p-4 bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F5EFE3] border-b border-amber-900/10 flex-shrink-0">
         {/* Soft radial glow in center for logo presentation */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-amber-100/30 pointer-events-none" />
 
@@ -120,30 +139,30 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
         <div className="absolute inset-0 bg-[radial-gradient(#e5dec9_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none" />
 
         {/* Company Photo / Logo */}
-        <div className="relative z-10 w-full h-full flex items-center justify-center p-3">
+        <div className="relative z-10 w-full h-full flex items-center justify-center p-2 sm:p-3">
           <img
             src={company.imageUrl || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80'}
             alt={company.name}
-            className="max-h-full max-w-full object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-500 pointer-events-none"
+            className="max-h-[85%] max-w-[85%] object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-500 pointer-events-none"
           />
         </div>
 
         {/* Floating Category Tag */}
-        <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-          <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md backdrop-blur-md ${categoryColorMap[company.category] || 'bg-slate-800 text-white'}`}>
+        <div className="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 z-20 flex items-center gap-1.5 max-w-[70%]">
+          <span className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold shadow-md backdrop-blur-md truncate ${categoryColorMap[company.category] || 'bg-slate-800 text-white'}`}>
             {company.industry}
           </span>
-          <span className="bg-white/80 backdrop-blur-md text-slate-700 border border-amber-900/10 text-xs px-2.5 py-1 rounded-full flex items-center gap-1 font-semibold shadow-sm">
+          <span className="hidden xs:inline-flex bg-white/85 backdrop-blur-md text-slate-700 border border-amber-900/10 text-[11px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full items-center gap-1 font-semibold shadow-sm">
             <MapPin className="w-3 h-3 text-amber-500" />
-            {company.city}
+            <span className="truncate">{company.city}</span>
           </span>
         </div>
 
         {/* Slots Badge */}
-        <div className="absolute top-4 right-4 z-20">
-          <span className="bg-emerald-500 text-white font-extrabold text-xs px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+        <div className="absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 z-20">
+          <span className="bg-emerald-500 text-white font-extrabold text-[11px] sm:text-xs px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full shadow-md flex items-center gap-1">
             <CheckCircle2 className="w-3 h-3" />
-            {company.slots} TIP-Plätze
+            <span>{company.slots} Plätze</span>
           </span>
         </div>
 
@@ -152,19 +171,19 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
           <>
             <motion.div
               style={{ opacity: likeOpacity }}
-              className="absolute top-12 left-6 border-4 border-emerald-500 text-emerald-500 font-black text-3xl px-4 py-1.5 rounded-2xl rotate-[-15deg] pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/60 shadow-2xl z-30"
+              className="absolute top-10 left-5 border-4 border-emerald-500 text-emerald-500 font-black text-2xl sm:text-3xl px-3 sm:px-4 py-1 rounded-2xl rotate-[-15deg] pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/70 shadow-2xl z-30"
             >
               INTERESSE
             </motion.div>
             <motion.div
               style={{ opacity: nopeOpacity }}
-              className="absolute top-12 right-6 border-4 border-rose-500 text-rose-500 font-black text-3xl px-4 py-1.5 rounded-2xl rotate-[15deg] pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/60 shadow-2xl z-30"
+              className="absolute top-10 right-5 border-4 border-rose-500 text-rose-500 font-black text-2xl sm:text-3xl px-3 sm:px-4 py-1 rounded-2xl rotate-[15deg] pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/70 shadow-2xl z-30"
             >
               WEITER
             </motion.div>
             <motion.div
               style={{ opacity: superOpacity }}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 border-4 border-amber-400 text-amber-500 font-black text-3xl px-5 py-1.5 rounded-2xl pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/70 shadow-2xl z-30 text-center"
+              className="absolute bottom-5 left-1/2 -translate-x-1/2 border-4 border-amber-400 text-amber-500 font-black text-2xl sm:text-3xl px-4 sm:px-5 py-1 rounded-2xl pointer-events-none uppercase tracking-wider backdrop-blur-sm bg-white/80 shadow-2xl z-30 text-center whitespace-nowrap"
             >
               ⭐ TRAUMBERUF
             </motion.div>
@@ -173,46 +192,46 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
       </div>
 
       {/* 2. Body / Content Area */}
-      <div className="p-5 h-1/2 flex flex-col justify-between bg-white text-slate-800">
-        <div>
+      <div className="p-3.5 sm:p-5 flex-1 flex flex-col justify-between bg-white text-slate-800 overflow-hidden min-h-0">
+        <div className="space-y-1.5 sm:space-y-2 overflow-y-auto pr-0.5 no-scrollbar flex-1 min-h-0">
           {/* Company Title */}
-          <div className="mb-2">
-            <h3 className="text-xl font-black leading-snug text-slate-900 tracking-tight group-hover:text-school-blue transition-colors">
+          <div>
+            <h3 className="text-base sm:text-lg lg:text-xl font-black leading-snug text-slate-900 tracking-tight group-hover:text-school-blue transition-colors">
               {company.name}
             </h3>
-            <p className="text-xs text-school-blue font-bold flex items-center gap-1 mt-0.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              Tag in der Praxis Partner
+            <p className="text-[11px] sm:text-xs text-school-blue font-bold flex items-center gap-1 mt-0.5">
+              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-500" />
+              <span>Tag in der Praxis Partner</span>
             </p>
           </div>
 
           {/* Highlights */}
-          <div className="flex flex-wrap gap-1.5 mb-2.5">
+          <div className="flex flex-wrap gap-1 sm:gap-1.5">
             {company.highlights.slice(0, 3).map((item, idx) => (
               <span
                 key={idx}
-                className="text-xs font-semibold px-2 py-0.5 rounded-lg bg-amber-50/70 text-slate-700 border border-amber-200/50"
+                className="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-lg bg-amber-50/70 text-slate-700 border border-amber-200/50"
               >
                 {item}
               </span>
             ))}
           </div>
 
-          {/* Description */}
-          <p className={`text-xs text-slate-600 leading-relaxed ${showFullDesc ? '' : 'line-clamp-2'}`}>
+          {/* Full Description text without premature cut-off */}
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
             {company.shortDescription}
           </p>
         </div>
 
-        {/* Steckbrief & Detail Trigger */}
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+        {/* Steckbrief & Detail Trigger - Stably anchored and never pushed out */}
+        <div className="pt-2 sm:pt-2.5 mt-1 border-t border-slate-100 flex items-center justify-between flex-shrink-0">
           {company.pdfUrl ? (
             <a
               href={company.pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-school-blue hover:text-school-darkblue bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition"
+              className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-school-blue hover:text-school-darkblue bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl transition shadow-xs"
             >
               <FileText className="w-3.5 h-3.5" />
               <span>EduPage Steckbrief (PDF)</span>
@@ -227,9 +246,9 @@ export const SwipeCard: React.FC<SwipeCardProps> = ({ company, isFront, onSwipe,
               e.stopPropagation();
               onOpenDetails(company);
             }}
-            className="inline-flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 px-2.5 py-1.5 rounded-xl transition"
+            className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-slate-600 hover:text-school-blue bg-slate-50 hover:bg-blue-50 border border-slate-200/70 px-2.5 py-1.5 rounded-xl transition"
           >
-            <Info className="w-3.5 h-3.5" />
+            <Info className="w-3.5 h-3.5 text-school-blue" />
             <span>Details</span>
           </button>
         </div>
