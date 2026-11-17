@@ -5,28 +5,56 @@ import { INITIAL_COMPANIES } from '../data/companiesData';
 
 const COMPANIES_COLLECTION = 'tip_companies';
 const PREFERENCES_COLLECTION = 'tip_student_preferences';
+const COMPANIES_CACHE_TTL_MS = 60_000;
+
+let cachedCompaniesList: Company[] | null = null;
+let cachedCompaniesAt = 0;
+let inFlightCompaniesLoad: Promise<Company[]> | null = null;
+
+export function invalidateCompaniesCache(): void {
+  cachedCompaniesList = null;
+  cachedCompaniesAt = 0;
+  inFlightCompaniesLoad = null;
+}
 
 export async function fetchCompanies(): Promise<Company[]> {
-  try {
-    const colRef = collection(db, COMPANIES_COLLECTION);
-    const snapshot = await getDocs(colRef);
-    if (!snapshot.empty) {
-      const list: Company[] = [];
-      snapshot.forEach(doc => {
-        list.push({ id: doc.id, ...doc.data() } as Company);
-      });
-      return list;
-    }
-  } catch (error) {
-    console.warn('Firestore fetch failed, falling back to local initial companies:', error);
+  const now = Date.now();
+  if (cachedCompaniesList && now - cachedCompaniesAt < COMPANIES_CACHE_TTL_MS) {
+    return cachedCompaniesList;
   }
-  return INITIAL_COMPANIES;
+  if (inFlightCompaniesLoad) {
+    return inFlightCompaniesLoad;
+  }
+
+  inFlightCompaniesLoad = (async () => {
+    try {
+      const colRef = collection(db, COMPANIES_COLLECTION);
+      const snapshot = await getDocs(colRef);
+      if (!snapshot.empty) {
+        const list: Company[] = [];
+        snapshot.forEach(doc => {
+          list.push({ id: doc.id, ...doc.data() } as Company);
+        });
+        cachedCompaniesList = list;
+        cachedCompaniesAt = Date.now();
+        return list;
+      }
+    } catch (error) {
+      console.warn('Firestore fetch failed, falling back to local initial companies:', error);
+    } finally {
+      inFlightCompaniesLoad = null;
+    }
+    return INITIAL_COMPANIES;
+  })();
+
+  return inFlightCompaniesLoad;
 }
 
 export async function saveCompany(company: Company): Promise<void> {
   try {
     const docRef = doc(db, COMPANIES_COLLECTION, company.id);
     await setDoc(docRef, company, { merge: true });
+    invalidateCompaniesCache();
   } catch (error) {
     console.error('Error saving company to Firestore:', error);
     throw error;
@@ -44,6 +72,7 @@ export async function seedCompaniesToFirestore(): Promise<number> {
       console.error('Error seeding company:', comp.id, e);
     }
   }
+  invalidateCompaniesCache();
   return count;
 }
 
